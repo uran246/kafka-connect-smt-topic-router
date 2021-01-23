@@ -11,40 +11,55 @@ import java.util.Map;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStruct;
 
-public class ElasticIndexRouter<R extends ConnectRecord<R>> implements Transformation<R> {
+public class TopicRouter<R extends ConnectRecord<R>> implements Transformation<R> {
     public static final String OVERVIEW_DOC = "A simple SMT to manipulate the index name using a document field.";
 
-    public static final String INDEX_ROUTE_NAME = "configure-me";
+    public static final String TOPIC_ROUTER_NAME = "topic.appendix.field";
 
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
-            .define(INDEX_ROUTE_NAME,
+            .define(TOPIC_ROUTER_NAME,
                     ConfigDef.Type.STRING,
                     ConfigDef.NO_DEFAULT_VALUE,
                     new ConfigDef.NonEmptyString(),
                     ConfigDef.Importance.HIGH,
-                    "Field name for the index name apendix.");
+                    "Field name for the topic name appendix.");
 
-    private static final String PURPOSE = "copying field from value to timestamp";
+    private static final String PURPOSE = "Append fieldvalue to topicname";
 
     private String field;
 
     @Override
-    public R apply(R r) {
-        return null;
+    public void configure(Map<String, ?> configs) {
+        final SimpleConfig config = new SimpleConfig(CONFIG_DEF, configs);
+        field = config.getString(TOPIC_ROUTER_NAME);
+    }
+
+    @Override
+    public R apply(R record) {
+        String topic;
+        Object topicAppendix;
+
+        if (record.valueSchema() == null) {
+            final Map<String, Object> value = requireMap(record.value(), PURPOSE);
+            topicAppendix = value.get(field);
+        } else {
+            final Struct value = requireStruct(record.value(), PURPOSE);
+            topicAppendix = value.get(field);
+        }
+        if(topicAppendix instanceof java.lang.String) {
+            topic = record.topic() + "-" + topicAppendix;
+        } else {
+            topic = record.topic();
+        }
+        return record.newRecord(topic, record.kafkaPartition(), record.keySchema(), record.key(), record.valueSchema(), record.value(), record.timestamp());
     }
 
     @Override
     public ConfigDef config() {
-        return null;
+        return CONFIG_DEF;
     }
 
     @Override
     public void close() {
-
-    }
-
-    @Override
-    public void configure(Map<String, ?> map) {
-
     }
 }
