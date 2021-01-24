@@ -47,7 +47,11 @@ public class TopicRouter<R extends ConnectRecord<R>> implements Transformation<R
             topicAppendix = value.get(field);
         }
         if(topicAppendix instanceof java.lang.String) {
-            topic = record.topic() + "-" + topicAppendix;
+            if (((String) topicAppendix).isEmpty() || topicAppendix == null ) {
+                topic = record.topic() + "-undefind";
+            } else {
+                topic = record.topic() + "-"  + topicAppendix;
+            }
         } else {
             topic = record.topic();
         }
