@@ -19,7 +19,7 @@ public class TopicRouter<R extends ConnectRecord<R>> implements Transformation<R
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
             .define(TOPIC_ROUTER_NAME,
                     ConfigDef.Type.STRING,
-                    ConfigDef.NO_DEFAULT_VALUE,
+                    "changeMe",
                     new ConfigDef.NonEmptyString(),
                     ConfigDef.Importance.HIGH,
                     "Field name for the topic name appendix.");
@@ -48,7 +48,7 @@ public class TopicRouter<R extends ConnectRecord<R>> implements Transformation<R
         }
         if(topicAppendix instanceof java.lang.String) {
             if (((String) topicAppendix).isEmpty() || topicAppendix == null ) {
-                topic = record.topic() + "-undefind";
+                topic = record.topic() + "-undefined";
             } else {
                 topic = record.topic() + "-"  + topicAppendix;
             }
