@@ -12,7 +12,7 @@ import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStruct;
 
 public class TopicRouter<R extends ConnectRecord<R>> implements Transformation<R> {
-    public static final String OVERVIEW_DOC = "A simple SMT to manipulate the index name using a document field.";
+    public static final String OVERVIEW_DOC = "A simple SMT to manipulate the topicname using a document field.";
 
     public static final String TOPIC_ROUTER_NAME = "topic.appendix.field";
 
